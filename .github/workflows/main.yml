@@ -33,7 +33,7 @@ jobs:
         
       - name: Build EXE
         run: |
-          pyinstaller --noconfirm --onefile --windowed --icon "icon.ico" --name "NotaireCiclade" --add-data "icon.ico;." --add-data ".env;." --add-data "updater.exe;." --add-data "CapSolver;CapSolver/" --distpath ./output "notaire_ciclade.py"
+          pyinstaller --noconfirm --onefile --windowed --icon "icon.ico" --name "NotaireCiclade" --add-data "icon.ico;." --add-data ".env;." --add-data "updater.exe;." --add-data "version.txt;." --add-data "CapSolver;CapSolver/" --distpath ./output "notaire_ciclade.py"
 
         working-directory: ./  # Modify this path
       - name: Copy EXE to GitHub workspace
