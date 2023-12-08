@@ -26,7 +26,7 @@ jobs:
         working-directory: ./  # Modify this path
 
       - name: Create .env File
-        run: echo 'CLIENT_SECRET=${{secrets.API_KEY}}' > .env
+        run: echo 'API_KEY=${{secrets.API_KEY}}' > .env
 
       - name: Create Version File
         run: python -c "import datetime; print(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))" > version.txt
