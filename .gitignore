@@ -1,6 +1,4 @@
 /.venv
-/k.json
 /settings.pkl
-/build/
-/NotaireCiclade.spec
 /.env
+/output

@@ -19,9 +19,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from dotenv import load_dotenv
 
-
-check_for_updates()
-print("Running the latest version.")
+try:
+    check_for_updates()
+    print("Running the latest version.")
+except Exception as e:
+    print(e)
+    print("\n\n!! Error !!")
+    input("Press Enter to EXIT : ")
+    exit()
+    
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
