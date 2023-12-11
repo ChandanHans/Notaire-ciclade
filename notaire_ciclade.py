@@ -462,7 +462,7 @@ def start():
 
 
 root = tk.Tk()
-root.title("Notaire Ciclade Test")
+root.title("Notaire Ciclade")
 root.iconbitmap(resource_path('icon.ico'))
 root.geometry("600x500")
 root.configure(bg='#2c2f33')
