@@ -43,5 +43,5 @@ def check_for_updates():
     time_difference = remote_version_date - local_version_date
     # Check if the difference is greater than 2 minutes
     if time_difference > datetime.timedelta(minutes=2):
-        subprocess.Popen([UPDATER_EXE_PATH, GITHUB_EXE_URL, EXE_PATH])
+        subprocess.Popen([UPDATER_EXE_PATH, EXE_PATH, GITHUB_EXE_URL])
         sys.exit()
