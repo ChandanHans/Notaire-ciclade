@@ -2,3 +2,4 @@
 /settings.pkl
 /.env
 /output
+/__pycache__

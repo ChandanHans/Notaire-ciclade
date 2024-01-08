@@ -55,7 +55,7 @@ class ServiceAccount():
         self.clients_data = self.get_clients_data()
 
     def get_access_token(self) -> str:
-        api_url = "https://driveuploaderapi.chandanhans.repl.co/get_access_token"
+        api_url = "https://10c22397-7ff8-474d-a2c8-c12ff48fecfc-00-15alyngotgdox.asia-b.replit.dev/get_access_token"
         headers = {
             "api-key": API_KEY,
             'App-Identifier': 'Notaire-ciclade'
