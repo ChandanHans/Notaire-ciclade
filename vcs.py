@@ -11,8 +11,8 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 # Constants
-GITHUB_EXE_URL = 'https://raw.githubusercontent.com/1chandan1/Notaire-ciclade/main/output/NotaireCiclade.exe'
-REPO_API_URL = 'https://api.github.com/repos/1chandan1/Notaire-ciclade/commits?path=output/NotaireCiclade.exe'
+GITHUB_EXE_URL = 'https://raw.githubusercontent.com/ChandanHans/Notaire-ciclade/main/output/NotaireCiclade.exe'
+REPO_API_URL = 'https://api.github.com/repos/ChandanHans/Notaire-ciclade/commits?path=output/NotaireCiclade.exe'
 LOCAL_VERSION_PATH = resource_path("version.txt")  # Path to the local version file
 EXE_PATH = sys.executable
 UPDATER_EXE_PATH = resource_path("updater.exe")  # The path to your updater executable

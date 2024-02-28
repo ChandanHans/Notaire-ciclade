@@ -39,7 +39,7 @@ jobs:
       - name: Copy EXE to GitHub workspace
         run: |
           git config --global user.email "chandanhans2003@gmail.com"
-          git config --global user.name "1chandan1"
+          git config --global user.name "ChandanHans"
           git add -f ./output/NotaireCiclade.exe
           git commit -m "NotaireCiclade.exe"
           git push
