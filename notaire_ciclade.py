@@ -1,13 +1,12 @@
 import os
 import pickle
-import json
 import sys
 import tkinter as tk
 from threading import Thread
 from time import sleep
 from tkinter import filedialog
 from typing import Dict, List, Tuple
-from version import check_for_updates
+from vcs import check_for_updates
 
 import requests
 from unidecode import unidecode
@@ -19,9 +18,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from dotenv import load_dotenv
 
+
 try:
     check_for_updates()
     print("Running the latest version.")
+except FileNotFoundError:
+    pass
 except Exception as e:
     print(e)
     print("\n\n!! Error !!")
@@ -307,20 +309,17 @@ def start_browser() -> webdriver.Chrome:
     options.add_argument("--app=https://ciclade.caissedesdepots.fr/monespace")
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(15)
+    
     try:
         driver.find_element(
             By.XPATH, '//*[@id="didomi-notice-agree-button"]').click()
         sleep(3)
-    except Exception as e:
-        print(f"Error while agreeing to terms: {e}")
+    except Exception:
+        pass
     login(driver)
     return driver
 
-def solve_captcha(driver: webdriver.Chrome):
-    solver_element = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH,'//div[@class="capsolver-solver-info"]')))
-    while solver_element.text != "Captcha solved!":
-        solver_element = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH,'//div[@class="capsolver-solver-info"]')))
-        sleep(2)
+
         
         
 def login(driver: webdriver.Chrome):
@@ -333,24 +332,61 @@ def login(driver: webdriver.Chrome):
 
 def click_element(driver : webdriver.Chrome, xpath):
     """Utility function to click on an element identified by xpath"""
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
+    for attempt in range(5):
+        try:
+            element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, xpath))
+            )
+            element.click()
+            return
+        except Exception as e:
+            if attempt == 4:  # Last attempt
+                raise
     
 
 def send_keys_to_element(driver : webdriver.Chrome, xpath, text):
     """Utility function to send text to an element identified by xpath"""
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, xpath))).send_keys(text)
-
+    for attempt in range(5):
+        try:
+            element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, xpath))
+            )
+            element.send_keys(text)
+            return
+        except Exception as e:
+            if attempt == 4:  # Last attempt
+                raise
 
 def upload_to_element(driver : webdriver.Chrome, xpath, path):
     """Utility function to send text to an element identified by xpath"""
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath))).send_keys(path)
-
+    for attempt in range(5):
+        try:
+            element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, xpath))
+            )
+            element.send_keys(path)
+            return
+        except Exception as e:
+            if attempt == 4:  # Last attempt
+                raise
+            
+def solve_captcha(driver : webdriver.Chrome):
+    while True:
+        try:
+            captcha_value = driver.execute_script("return document.querySelector('#CAPTCHA').value;")
+            break
+        except:
+            pass
+    while captcha_value == "":
+        captcha_value = driver.execute_script("return document.querySelector('#CAPTCHA').value;")
+        sleep(2)
+        
 def new_search(driver : webdriver.Chrome, client_data : Dict, temp_file1, temp_file2) -> bool :
     try:
         driver.get("https://ciclade.caissedesdepots.fr/monespace/#/service/recherche")
         driver.refresh()
 
-        # Fill out the form with the client data
+        solve_captcha(driver)
         click_element(driver, '//input[@id="f-s-p-death-yes"]')
         click_element(driver, '//*[@id="f-s-p-civilite-monsieur"]')
         send_keys_to_element(driver, '//input[@id="f-s-p-death-day"]', client_data["dod"])
@@ -359,16 +395,18 @@ def new_search(driver : webdriver.Chrome, client_data : Dict, temp_file1, temp_f
         send_keys_to_element(driver, '//input[@id="f-s-p-name1"]', client_data["lname"])
         click_element(driver, '//*[@id="f-s-p-nationality"]/option[@value="FRA"]')
         click_element(driver, '//*[@id="f-s-p-connu-no"]')
-        solve_captcha(driver)
-        sleep(1)
         click_element(driver, '//button[@type="submit"]')
-        click_element(driver, '//button[@ng-click="vm.rechercher()"]')
-        click_element(driver, '//*[@ng-if="vm.adresseFiscaleRenseigne"]')
+        click_element(driver, '//*[@ng-click="vm.rechercher()"]')
+        try:
+            WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="FinalisationButton""]')))
+        except:
+            new_search(driver, client_data , temp_file1, temp_file2)
+            return
         
         # Step 1
         for _ in range(5):
             try:
-                WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="f-s-p-titulaire"]')))
+                WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="FinalisationButton""]')))
                 sleep(3)
                 click_element(driver, '//*[@id="positionDemandeur"]/option[@label="Notaire"]')
                 click_element(driver, '//*[@id="f-s-p-paysBanque"]/option[@value="FR"]')
@@ -376,7 +414,7 @@ def new_search(driver : webdriver.Chrome, client_data : Dict, temp_file1, temp_f
                 send_keys_to_element(driver, '//*[@id="f-s-p-iban"]', iban_var.get())
                 send_keys_to_element(driver, '//*[@id="f-s-p-bic"]', bic_var.get())
                 upload_to_element(driver, '//*[@id="document"]', pdf_file_path)
-                click_element(driver, '//*[@id="page_top"]/div[2]/p[2]/button')
+                click_element(driver, '//*[@ng-click="vm.poursuivre()"]')
                 WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="docAdditionnelNon"]')))
                 break
             except:
@@ -394,7 +432,7 @@ def new_search(driver : webdriver.Chrome, client_data : Dict, temp_file1, temp_f
                 element.click()
                 upload_to_element(driver, '//*[@id="document-0"]', temp_file1)
                 upload_to_element(driver, '//*[@id="document-1"]', temp_file2)
-                click_element(driver, '//*[@id="page_top"]/div[2]/p[5]/button')
+                click_element(driver, '//*[@ng-click="vm.poursuivre()"]')
                 WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btnSoumission"]')))
                 break
             except:
@@ -407,7 +445,7 @@ def new_search(driver : webdriver.Chrome, client_data : Dict, temp_file1, temp_f
         
         # Final submission
         WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btnSoumission"]')))
-        # sleep(3)
+        sleep(3)
         # submit_button.click()
         sleep(5)
         return True

@@ -28,12 +28,12 @@ jobs:
       - name: Create .env File
         run: echo 'API_KEY=${{secrets.API_KEY}}' > .env
 
-      - name: Create Version File
-        run: python -c "import datetime; print(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))" > version.txt
+      - name: Create Date File
+        run: python -c "import datetime; print(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))" > date.txt
         
       - name: Build EXE
         run: |
-          pyinstaller --noconfirm --onefile --windowed --icon "icon.ico" --name "NotaireCiclade" --add-data "icon.ico;." --add-data ".env;." --add-data "updater.exe;." --add-data "version.txt;." --add-data "CapSolver;CapSolver/" --distpath ./output "notaire_ciclade.py"
+          pyinstaller --noconfirm --onefile --windowed --icon "icon.ico" --name "NotaireCiclade" --add-data "icon.ico;." --add-data ".env;." --add-data "updater.exe;." --add-data "dae.txt;." --add-data "CapSolver;CapSolver/" --distpath ./output "notaire_ciclade.py"
 
         working-directory: ./  # Modify this path
       - name: Copy EXE to GitHub workspace
