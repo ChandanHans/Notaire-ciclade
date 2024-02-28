@@ -13,13 +13,13 @@ def resource_path(relative_path):
 # Constants
 GITHUB_EXE_URL = 'https://raw.githubusercontent.com/ChandanHans/Notaire-ciclade/main/output/NotaireCiclade.exe'
 REPO_API_URL = 'https://api.github.com/repos/ChandanHans/Notaire-ciclade/commits?path=output/NotaireCiclade.exe'
-LOCAL_VERSION_PATH = resource_path("version.txt")  # Path to the local version file
+LOCAL_DATE_PATH = resource_path("date.txt")  # Path to the local version file
 EXE_PATH = sys.executable
 UPDATER_EXE_PATH = resource_path("updater.exe")  # The path to your updater executable
 
 def get_local_version_date():
     """Read the version date from the local version file."""
-    with open(LOCAL_VERSION_PATH, 'r') as file:
+    with open(LOCAL_DATE_PATH, 'r') as file:
         return datetime.datetime.strptime(file.read().strip(), '%Y-%m-%dT%H:%M:%SZ')
 
 def get_remote_version_date():
